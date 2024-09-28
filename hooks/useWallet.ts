@@ -24,6 +24,7 @@ export function useWallet() {
   const [account, setAccount] = useState<string | null>(null);
   const [chainId, setChainId] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
+  const [userAddress, setUserAddress] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
   useEffect(() => {
@@ -54,7 +55,6 @@ export function useWallet() {
       setIsConnected(true);
     } else {
       setIsConnected(false);
-      setBalance(null);
     }
   }, [account]);
 
@@ -75,6 +75,10 @@ export function useWallet() {
 
   function handleChainChanged(newChainId: string) {
     setChainId(newChainId);
+
+    if (account) getBalance(account);
+
+    if (userAddress) getBalance(userAddress);
   }
 
   function handleDisconnect() {
@@ -90,7 +94,20 @@ export function useWallet() {
     }
   }
 
-  // async function getBalance() {}
+  async function getBalance(address: string) {
+    setUserAddress(address);
+    try {
+      const newBalance = await window.ethereum.request({
+        method: "eth_getBalance",
+        params: [address, "latest"],
+      });
+
+      setBalance(parseInt(newBalance, 16).toString());
+    } catch (error) {
+      console.error(error);
+      setBalance(null);
+    }
+  }
 
   async function getAccount() {
     try {
@@ -120,5 +137,6 @@ export function useWallet() {
     handleDisconnect,
     isConnected,
     balance,
+    getBalance,
   };
 }

@@ -4,17 +4,13 @@ import { useWallet } from "../../hooks/useWallet";
 export function CheckBalance() {
   const [inputAddress, setInputAddress] = useState<string>("");
 
-  const { chainId, balance } = useWallet();
-
-  const handleWalletSubmit = () => {
-    console.log(inputAddress);
-  };
+  const { chainId, balance, getBalance } = useWallet();
 
   return (
-    <div className="h-1/2 grid place-items-center">
+    <div className="h-1/2 grid place-items-center mt-10">
       {!!balance && (
         <>
-          <p>Balance: {balance}</p>
+          <p>Balance: {balance} wei</p>
           <p>ChainID: {chainId}</p>
         </>
       )}
@@ -25,8 +21,11 @@ export function CheckBalance() {
           placeholder="Enter wallet address"
           value={inputAddress}
           onChange={(e) => setInputAddress(e.target.value)}
+          className="bg-white p-2 text-black w-[500px]"
         />
-        <button onClick={handleWalletSubmit}>Check Wallet</button>
+        <button className="" onClick={() => getBalance(inputAddress)}>
+          Check Wallet
+        </button>
       </div>
     </div>
   );
