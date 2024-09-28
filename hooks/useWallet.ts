@@ -13,10 +13,10 @@ interface MetaMaskEthereumProvider extends EventListener {
   // removeListener: (event: string, ) => {}
 }
 
-interface ProviderRpcError extends Error {
-  code: number;
-  data?: unknown;
-}
+// interface ProviderRpcError extends Error {
+//   code: number;
+//   data?: unknown;
+// }
 
 import { useEffect, useState } from "react";
 
@@ -103,12 +103,13 @@ export function useWallet() {
       } else {
         console.log("No accounts found.");
       }
-    } catch (error: ProviderRpcError) {
-      if (error.code === 4001) {
-        console.log("Please connect to MetaMask.");
-      } else {
-        console.error(error);
-      }
+    } catch (error) {
+      // if (error.code === 4001 as number) {
+      //   console.log("Please connect to MetaMask.");
+      // } else {
+      //   console.error(error);
+      // }
+      console.error(error);
     }
   }
 
