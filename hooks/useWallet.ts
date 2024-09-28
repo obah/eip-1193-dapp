@@ -54,6 +54,7 @@ export function useWallet() {
       setIsConnected(true);
     } else {
       setIsConnected(false);
+      setBalance(null);
     }
   }, [account]);
 
@@ -89,7 +90,7 @@ export function useWallet() {
     }
   }
 
-  async function getBalance() {}
+  // async function getBalance() {}
 
   async function getAccount() {
     try {
