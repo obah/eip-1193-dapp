@@ -10,22 +10,22 @@ declare global {
 interface MetaMaskEthereumProvider extends EventListener {
   request: (args: { method: string }) => Promise<any>;
   on: (event: string, handler: (...args: any[]) => void) => void;
-  // removeListener: (event: string, ) => {}
 }
-
-// interface ProviderRpcError extends Error {
-//   code: number;
-//   data?: unknown;
-// }
 
 import { useEffect, useState } from "react";
 
 export function useWallet() {
   const [account, setAccount] = useState<string | null>(null);
   const [chainId, setChainId] = useState<string | null>(null);
-  const [balance, setBalance] = useState<string | null>(null);
-  const [userAddress, setUserAddress] = useState<string | null>(null);
+  const [userBalance, setUserBalance] = useState<string | null>(null);
+  const [otherAccountBalance, setOtherAccountBalance] = useState<string | null>(
+    null
+  );
+  const [otherAccountAddress, setotherAccountAddress] = useState<string | null>(
+    null
+  );
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     async function setup() {
@@ -45,7 +45,6 @@ export function useWallet() {
           "accountsChanged",
           handleAccountsChanged
         );
-        window.ethereum.removeListener("disconnect", handleDisconnect);
       }
     };
   }, []);
@@ -53,8 +52,12 @@ export function useWallet() {
   useEffect(() => {
     if (account) {
       setIsConnected(true);
+      getUserBalance();
     } else {
       setIsConnected(false);
+      setUserBalance(null);
+      setOtherAccountBalance(null);
+      setotherAccountAddress(null);
     }
   }, [account]);
 
@@ -78,11 +81,13 @@ export function useWallet() {
 
     if (account) getBalance(account);
 
-    if (userAddress) getBalance(userAddress);
+    if (otherAccountAddress) getBalance(otherAccountAddress);
   }
 
   function handleDisconnect() {
     setAccount(null);
+    setUserBalance(null);
+    setOtherAccountBalance(null);
     alert("disconnected");
   }
 
@@ -95,18 +100,36 @@ export function useWallet() {
   }
 
   async function getBalance(address: string) {
-    setUserAddress(address);
+    let balance: string | null = null;
+
+    setIsLoading(true);
+
     try {
       const newBalance = await window.ethereum.request({
         method: "eth_getBalance",
         params: [address, "latest"],
       });
 
-      setBalance(parseInt(newBalance, 16).toString());
+      balance = parseInt(newBalance, 16).toString();
     } catch (error) {
       console.error(error);
-      setBalance(null);
     }
+
+    setIsLoading(false);
+
+    return balance;
+  }
+
+  async function getUserBalance() {
+    const balance = await getBalance(account as string);
+    setUserBalance(balance as string);
+  }
+
+  async function getOtherAccountBalance(address: string) {
+    setotherAccountAddress(address);
+
+    const balance = await getBalance(address);
+    setOtherAccountBalance(balance as string);
   }
 
   async function getAccount() {
@@ -136,7 +159,9 @@ export function useWallet() {
     getAccount,
     handleDisconnect,
     isConnected,
-    balance,
-    getBalance,
+    userBalance,
+    otherAccountBalance,
+    getOtherAccountBalance,
+    isLoading,
   };
 }
