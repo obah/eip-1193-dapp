@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useBalance } from "../../hooks/useBalance";
 import { Button } from "./ui/Button";
 import { formatEther } from "../../lib/utils";
+import { useWallet } from "../../hooks/useWallet";
 
 export function CheckBalance() {
   const [inputAddress, setInputAddress] = useState<string>("");
 
   const { balance, getBalance, isLoading, isInvalid } = useBalance();
+  const { walletData } = useWallet();
+
+  const { chainId } = walletData;
+
+  const handleGetBalance = useCallback(() => {
+    getBalance(inputAddress);
+  }, [inputAddress, getBalance]);
+
+  useEffect(() => {
+    handleGetBalance();
+  }, [chainId]);
 
   return (
     <div className="h-1/2 grid place-items-center mt-10">
@@ -29,7 +41,7 @@ export function CheckBalance() {
           className="bg-white p-2 text-black w-[500px]"
         />
 
-        <Button onClick={() => getBalance(inputAddress)}>
+        <Button onClick={handleGetBalance}>
           {isLoading ? "Loading..." : "Check Wallet"}
         </Button>
       </div>

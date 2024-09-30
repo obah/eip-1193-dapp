@@ -26,10 +26,10 @@ function App() {
         </div>
       </div>
 
-      {!account ? (
+      {account ? (
         <CheckBalance />
       ) : (
-        <div className="h-1/2 grid place-items-center">
+        <div className="text-center grid place-items-center">
           <Button onClick={getAccount}>Get started</Button>
         </div>
       )}
