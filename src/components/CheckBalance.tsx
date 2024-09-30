@@ -1,21 +1,22 @@
 import { useState } from "react";
-import { useWallet } from "../../hooks/useWallet";
+import { useBalance } from "../../hooks/useBalance";
 import { Button } from "./ui/Button";
 import { formatEther } from "../../lib/utils";
 
 export function CheckBalance() {
   const [inputAddress, setInputAddress] = useState<string>("");
 
-  const { otherAccountBalance, getOtherAccountBalance, isLoading } =
-    useWallet();
+  const { balance, getBalance, isLoading, isInvalid } = useBalance();
 
   return (
     <div className="h-1/2 grid place-items-center mt-10">
-      {!!otherAccountBalance && (
+      {!!balance && (
         <div className="mb-4">
-          <p className="text-xl">
-            Balance: {formatEther(otherAccountBalance)} ETH
-          </p>
+          {isInvalid ? (
+            <p className="text-xl text-red-500">Invalid Address</p>
+          ) : (
+            <p className="text-xl">Balance: {formatEther(balance)} ETH</p>
+          )}
         </div>
       )}
 
@@ -27,7 +28,8 @@ export function CheckBalance() {
           onChange={(e) => setInputAddress(e.target.value)}
           className="bg-white p-2 text-black w-[500px]"
         />
-        <Button onClick={() => getOtherAccountBalance(inputAddress)}>
+
+        <Button onClick={() => getBalance(inputAddress)}>
           {isLoading ? "Loading..." : "Check Wallet"}
         </Button>
       </div>
